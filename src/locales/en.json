@@ -79,7 +79,7 @@
         "outOfStockMessage": "This product is currently out of stock.",
         "productNotFound": "Product not found",
         "outOfStock": "Product is out of stock",
-        "limitExceeded": "Purchase limit exceeded. You cannot buy this product again.",
+        "limitExceeded": "Purchase quantity limit exceeded. You cannot buy this product again.",
         "stockLocked": "Stock is temporarily reserved. Please try again in a minute.",
         "stockLockedMessage": "Stock is currently locked. If reserved orders are not paid within 5 minutes, stock will be released. Please try again later!",
         "userBlocked": "This product has a purchase limit for you.",
@@ -381,7 +381,7 @@
             "imageLabel": "Image URL",
             "imagePlaceholder": "https://...",
             "saveButton": "Save Product",
-            "purchaseLimitLabel": "Purchase Limit",
+            "purchaseLimitLabel": "Purchase Limit (Cumulative)",
             "purchaseLimitPlaceholder": "0 or empty for unlimited",
             "saving": "Saving..."
         }
