@@ -36,21 +36,21 @@ export function CallbackContent({ params }: { params: any }) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-muted-foreground">Processing payment callback...</p>
+                <p className="text-muted-foreground">正在处理支付回调...</p>
             </div>
         )
     }
 
     return (
         <div className="container py-12 flex flex-col items-center gap-6">
-            <h1 className="text-2xl font-bold text-destructive">Redirect Failed</h1>
+            <h1 className="text-2xl font-bold text-destructive">跳转失败</h1>
             <p className="text-muted-foreground text-center">
-                Could not find Order ID in callback parameters. <br />
-                Please verify your order history manually.
+                未在回调参数中找到订单号。 <br />
+                请手动前往订单页核对。
             </p>
 
             <div className="w-full max-w-md bg-muted p-4 rounded-lg overflow-auto font-mono text-xs">
-                <p className="font-bold mb-2">Debug Info:</p>
+                <p className="font-bold mb-2">调试信息：</p>
                 <pre>{debugInfo}</pre>
             </div>
 
@@ -59,15 +59,16 @@ export function CallbackContent({ params }: { params: any }) {
                     onClick={() => router.push('/orders')}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                 >
-                    Go to My Orders
+                    前往我的订单
                 </button>
                 <button
                     onClick={() => router.push('/')}
                     className="px-4 py-2 border rounded-md hover:bg-muted"
                 >
-                    Go Home
+                    返回首页
                 </button>
             </div>
         </div>
     )
 }
+

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { Compass, Home, Package, Settings, User } from "lucide-react"
+import { Compass, Home, Settings, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface MobileNavProps {
@@ -16,12 +16,10 @@ export function MobileNav({ isLoggedIn, isAdmin, showNav = true }: MobileNavProp
     const { t } = useI18n()
     const pathname = usePathname()
 
-    const isZh = t('common.myOrders').includes('订单')
-    
     const navItems = [
         {
             href: "/",
-            label: isZh ? "首页" : "Home",
+            label: "首页",
             icon: Home,
             active: pathname === "/"
         },
@@ -39,7 +37,7 @@ export function MobileNav({ isLoggedIn, isAdmin, showNav = true }: MobileNavProp
         }] : []),
         ...(isLoggedIn ? [{
             href: "/profile",
-            label: isZh ? "个人中心" : "Profile",
+            label: "个人中心",
             icon: User,
             active: pathname === "/profile"
         }] : [])
@@ -72,3 +70,4 @@ export function MobileNav({ isLoggedIn, isAdmin, showNav = true }: MobileNavProp
         </nav>
     )
 }
+

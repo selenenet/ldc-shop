@@ -308,7 +308,7 @@ export function AdminOrdersContent({
                                             )}
                                         </div>
                                     ) : (
-                                        <span className="font-medium text-sm text-muted-foreground">Guest</span>
+                                        <span className="font-medium text-sm text-muted-foreground">访客</span>
                                     )}
                                 </TableCell>
                                 <TableCell>{order.productName}</TableCell>
@@ -389,3 +389,4 @@ export function AdminOrdersContent({
         </div>
     )
 }
+

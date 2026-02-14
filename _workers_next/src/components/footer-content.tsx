@@ -1,6 +1,7 @@
-'use client'
+﻿'use client'
 
 import { useI18n } from "@/lib/i18n/context"
+import Link from "next/link"
 import type { ReactNode } from "react"
 
 interface FooterContentProps {
@@ -40,7 +41,7 @@ export function FooterContent({ customFooter, version }: FooterContentProps) {
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-muted-foreground/80 hover:text-primary transition-colors duration-300"
+                        className="text-[#9cb0cb] transition-colors hover:text-white"
                     >
                         {url}
                     </a>
@@ -69,17 +70,60 @@ export function FooterContent({ customFooter, version }: FooterContentProps) {
     }
 
     return (
-        <footer className="border-t border-border/50 py-6 pb-20 md:py-0 md:pb-0 bg-gradient-to-t from-muted/30 to-transparent">
-            <div className="container flex flex-col items-center justify-between gap-4 md:h-20 md:flex-row">
-                <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-                    <p
-                        className="text-center text-xs leading-loose text-muted-foreground/80 md:text-left footer-html"
-                        dangerouslySetInnerHTML={{ __html: footerText }}
-                    />
+        <footer className="mt-auto border-t border-[#263247] bg-[#070b12] pb-20 pt-14 md:pb-10">
+            <div className="container">
+                <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="space-y-5">
+                        <div className="flex items-center gap-3">
+                            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2f3b4d] bg-[#111a27] text-sm font-bold text-[#dbe7f7]">
+                                LD
+                            </div>
+                            <p className="font-display text-2xl font-semibold tracking-tight text-white">LDC 商店</p>
+                        </div>
+                        <p className="text-sm leading-relaxed text-[#93a3ba] footer-html">
+                            {renderFooterText(footerText)}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 className="mb-4 font-display text-xl font-semibold text-white">商城导航</h4>
+                        <div className="space-y-2 text-sm text-[#91a3bc]">
+                            <Link href="/" className="block transition-colors hover:text-white">全部商品</Link>
+                            <Link href="/?sort=soldDesc" className="block transition-colors hover:text-white">热门推荐</Link>
+                            <Link href="/?sort=priceAsc" className="block transition-colors hover:text-white">优惠价格</Link>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="mb-4 font-display text-xl font-semibold text-white">帮助支持</h4>
+                        <div className="space-y-2 text-sm text-[#91a3bc]">
+                            <Link href="/orders" className="block transition-colors hover:text-white">我的订单</Link>
+                            <Link href="/profile" className="block transition-colors hover:text-white">个人中心</Link>
+                            <a href="https://connect.linux.do" target="_blank" rel="noreferrer" className="block transition-colors hover:text-white">Linux DO 互联</a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="mb-4 font-display text-xl font-semibold text-white">Selene的小站</h4>
+                        <p className="mb-3 text-sm font-medium text-[#dce6f4]">欢迎来购买</p>
+                        <div aria-hidden="true" className="rounded-xl border border-[#2f3a4b] bg-[#111a27]/80 p-3">
+                            <div className="h-2 w-2/3 rounded-full bg-[#44556d]" />
+                            <div className="mt-2 h-2 w-1/2 rounded-full bg-[#36465c]" />
+                        </div>
+                    </div>
                 </div>
-                <a href="https://github.com/chatgptuk/ldc-shop" target="_blank" rel="noreferrer" className="text-center text-xs text-muted-foreground/40 hover:text-primary transition-colors duration-300">
-                    v{version}
-                </a>
+
+                <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-[#222d3f] pt-6 text-xs text-[#63748b] md:flex-row md:items-center">
+                    <p>2026 LDC 商店。非官方服务，仅用于演示与自部署。</p>
+                    <div className="flex items-center gap-3">
+                        <a href="https://github.com/chatgptuk/ldc-shop" target="_blank" rel="noreferrer" className="text-[#8ea2be] transition-colors hover:text-white">
+                            v{version}
+                        </a>
+                        <span className="rounded-full border border-[#2c3748] bg-[#111a27] px-2.5 py-1 font-mono text-[10px] text-[#8da0ba]">
+                            中文界面
+                        </span>
+                    </div>
+                </div>
             </div>
         </footer>
     )

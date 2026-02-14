@@ -1,17 +1,22 @@
-"use client"
+﻿"use client"
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react"
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { StarRatingStatic } from "@/components/star-rating-static"
-import { NavigationPill } from "@/components/navigation-pill"
 import { useI18n } from "@/lib/i18n/context"
 import { INFINITE_STOCK } from "@/lib/constants"
+import {    ChevronLeft,
+    ChevronRight,
+    Filter,
+    PackageOpen,
+    Search,
+    Sparkles,
+} from "lucide-react"
 
 interface Product {
     id: string
@@ -45,18 +50,20 @@ export function HomeContent({ products, announcement, visitorCount, categories =
     const { t } = useI18n()
     const [selectedCategory, setSelectedCategory] = useState<string | null>(filters.category || null)
     const [searchTerm, setSearchTerm] = useState(filters.q || "")
-    const [sortKey, setSortKey] = useState(filters.sort || "default")
     const [page, setPage] = useState(pagination.page || 1)
+    const categoriesScrollerRef = useRef<HTMLDivElement | null>(null)
     const deferredSearch = useDeferredValue(searchTerm)
 
     useEffect(() => {
         setPage(1)
-    }, [selectedCategory, sortKey, deferredSearch])
+    }, [selectedCategory, deferredSearch])
 
     const filteredProducts = useMemo(() => {
         const keyword = deferredSearch.trim().toLowerCase()
+
         return products.filter((product) => {
             if (selectedCategory && product.category !== selectedCategory) return false
+
             if (!keyword) return true
             const name = (product.name || "").toLowerCase()
             const desc = (product.descriptionPlain || product.description || "").toLowerCase()
@@ -64,23 +71,20 @@ export function HomeContent({ products, announcement, visitorCount, categories =
         })
     }, [products, selectedCategory, deferredSearch])
 
-    const sortedProducts = useMemo(() => {
-        const list = [...filteredProducts]
-        switch (sortKey) {
-            case "priceAsc":
-                return list.sort((a, b) => Number(a.price) - Number(b.price))
-            case "priceDesc":
-                return list.sort((a, b) => Number(b.price) - Number(a.price))
-            case "stockDesc":
-                return list.sort((a, b) => (b.stockCount || 0) - (a.stockCount || 0))
-            case "soldDesc":
-                return list.sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
-            case "hot":
-                return list.sort((a, b) => Number(!!b.isHot) - Number(!!a.isHot))
-            default:
-                return list
-        }
-    }, [filteredProducts, sortKey])
+    const sortedProducts = filteredProducts
+
+    const categoryCards = useMemo(
+        () => [
+            { key: null as string | null, label: t("common.all"), icon: "#" },
+            ...categories.map((name, idx) => ({
+                key: name,
+                label: name,
+                icon: (categoryConfig?.find((c) => c.name === name)?.icon || ["+", "*", "=", "~", "@", "%"][idx % 6]).slice(0, 2),
+            })),
+        ],
+        [categories, categoryConfig, t]
+    )
+    const showCategoryRail = categoryCards.length > 1
 
     const totalPages = Math.max(1, Math.ceil(sortedProducts.length / pagination.pageSize))
     const currentPage = Math.min(Math.max(1, page), totalPages)
@@ -89,51 +93,45 @@ export function HomeContent({ products, announcement, visitorCount, categories =
     const hasMore = currentPage < totalPages
 
     return (
-        <main className="container py-8 md:py-16 relative overflow-hidden">
-            {/* Atmosphere background */}
+        <main className="container relative overflow-hidden py-8 md:py-12">
             <div className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute -top-48 left-1/2 h-80 w-[90vw] -translate-x-1/2 rounded-full bg-gradient-to-r from-primary/8 via-sky-200/8 to-emerald-200/8 blur-3xl" />
-                <div className="absolute top-10 left-[12%] h-36 w-60 rounded-full bg-primary/7 blur-3xl" />
-                <div className="absolute top-16 right-[10%] h-32 w-56 rounded-full bg-sky-200/8 blur-3xl dark:bg-sky-200/6" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(0,0,0,0.015),_transparent_70%)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.02),_transparent_70%)]" />
-                <div className="absolute inset-0 opacity-[0.012] [background-image:radial-gradient(#000000_1px,transparent_1px)] [background-size:24px_24px] dark:[background-image:radial-gradient(#ffffff_1px,transparent_1px)]" />
+                <div className="absolute -top-56 left-1/2 h-[26rem] w-[90vw] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(225,29,46,0.2),rgba(225,29,46,0))] blur-3xl" />
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-[linear-gradient(to_top,rgba(8,11,17,0.9),rgba(8,11,17,0))]" />
+                <div className="absolute inset-0 opacity-[0.04] [background-image:radial-gradient(#ffffff_0.8px,transparent_0.8px)] [background-size:26px_26px]" />
             </div>
 
-            {/* Announcement Banner */}
             {announcement && (
                 <section className="mb-8">
-                    <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-primary/50" />
+                    <div className="relative overflow-hidden rounded-2xl border border-[#28303d] bg-[#121822]/85 p-4 backdrop-blur-md">
+                        <div className="absolute left-0 top-0 h-full w-1 bg-[#e11d2e]" />
                         <div className="flex items-start gap-3 pl-3">
-                            <svg className="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="mt-0.5 h-5 w-5 shrink-0 text-[#ff4b57]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                             </svg>
-                            <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{announcement}</p>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#dbe6f5]">{announcement}</p>
                         </div>
                     </div>
                 </section>
             )}
 
-            {/* Pending Orders Notification */}
             {pendingOrders && pendingOrders.length > 0 && (
                 <section className="mb-8">
-                    <div className="relative overflow-hidden rounded-xl border border-yellow-500/20 bg-gradient-to-r from-yellow-500/5 via-yellow-500/10 to-yellow-500/5 p-4">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-yellow-500 to-yellow-500/50" />
+                    <div className="relative overflow-hidden rounded-2xl border border-yellow-500/25 bg-[#121822]/90 p-4">
+                        <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-yellow-500 to-yellow-500/50" />
                         <div className="flex items-center justify-between gap-4 pl-3">
                             <div className="flex items-center gap-3">
-                                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg className="h-5 w-5 shrink-0 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <p className="text-sm font-medium text-foreground/90">
+                                <p className="text-sm font-medium text-[#dbe6f5]">
                                     {pendingOrders.length === 1
-                                        ? t('home.pendingOrder.single', { orderId: pendingOrders[0].orderId })
-                                        : t('home.pendingOrder.multiple', { count: pendingOrders.length })
-                                    }
+                                        ? t("home.pendingOrder.single", { orderId: pendingOrders[0].orderId })
+                                        : t("home.pendingOrder.multiple", { count: pendingOrders.length })}
                                 </p>
                             </div>
-                            <Link href={pendingOrders.length === 1 ? `/order/${pendingOrders[0].orderId}` : '/orders'}>
-                                <Button size="sm" variant="outline" className="border-yellow-500/30 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 cursor-pointer">
-                                    {pendingOrders.length === 1 ? t('common.payNow') : t('common.viewOrders')}
+                            <Link href={pendingOrders.length === 1 ? `/order/${pendingOrders[0].orderId}` : "/orders"}>
+                                <Button size="sm" variant="outline" className="cursor-pointer border-yellow-500/30 bg-[#1a2230] text-[#f7f1c8] hover:bg-yellow-500/10 hover:text-yellow-300">
+                                    {pendingOrders.length === 1 ? t("common.payNow") : t("common.viewOrders")}
                                 </Button>
                             </Link>
                         </div>
@@ -141,225 +139,237 @@ export function HomeContent({ products, announcement, visitorCount, categories =
                 </section>
             )}
 
-            {/* Header Area with Visitor Count and Controls */}
-            <div className="flex flex-col gap-6 mb-8">
-                <div className="flex items-center justify-between">
-                    {typeof visitorCount === 'number' && (
-                        <Badge variant="secondary" className="px-3 py-1 bg-background/70 shadow-sm border border-border/40">
-                            {t('home.visitorCount', { count: visitorCount })}
-                        </Badge>
-                    )}
-                    {wishlistEnabled && (
-                        <Link href="/wishlist">
-                            <Button size="icon-sm" variant="outline" className="h-9 w-9 p-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
-                                </svg>
-                                <span className="sr-only">{t('wishlist.title')}</span>
-                            </Button>
-                        </Link>
-                    )}
-                </div>
-
-                {/* Top Toolbar: Search & Filter Pills */}
-                <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-card/50 p-1 rounded-xl">
-                    {/* Search Bar */}
-                    <div className="relative w-full md:w-72 shrink-0">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+            {showCategoryRail ? (
+            <section className="mb-10">
+                <div className="mb-5 flex items-center justify-between">
+                    <h2 className="font-display text-2xl font-bold tracking-tight text-white">{t("common.categories")}</h2>
+                    <div className="hidden items-center gap-2 md:flex">
+                        <button
+                            type="button"
+                            onClick={() => categoriesScrollerRef.current?.scrollBy({ left: -420, behavior: "smooth" })}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2a3342] bg-[#121822] text-[#a4b0c3] transition-colors hover:text-white"
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <Input
-                            placeholder={t('common.searchPlaceholder')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9 w-full bg-background border-border/50 focus:bg-background transition-all"
-                        />
+                            <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => categoriesScrollerRef.current?.scrollBy({ left: 420, behavior: "smooth" })}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2a3342] bg-[#121822] text-[#a4b0c3] transition-colors hover:text-white"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </button>
                     </div>
-
-                    {/* Apple-style Category Navigation Pill */}
-                    <div className="flex-1 w-full overflow-x-auto no-scrollbar pb-2 md:pb-0">
-                        <NavigationPill
-                            items={[
-                                { key: '', label: t('common.all') },
-                                ...categories.map(cat => ({
-                                    key: cat,
-                                    label: categoryConfig?.find(c => c.name === cat)?.icon
-                                        ? `${categoryConfig.find(c => c.name === cat)?.icon} ${cat}`
-                                        : cat,
-                                }))
-                            ]}
-                            selectedKey={selectedCategory || ''}
-                            onSelect={(key) => setSelectedCategory(key || null)}
-                        />
-                    </div>
-
-                    {/* Sort Dropdown (Simplified as inline buttons for now, or dropdown later) */}
-                    <div className="shrink-0 flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
-                        <span className="text-xs text-muted-foreground font-medium whitespace-nowrap hidden md:inline-block mr-1">{t('home.sort.title')}:</span>
-                        {[
-                            { key: 'default', label: t('home.sort.default'), icon: null },
-                            { key: 'stockDesc', label: t('home.sort.stock'), icon: '📦' },
-                            { key: 'soldDesc', label: t('home.sort.sold'), icon: '🔥' },
-                            { key: 'priceAsc', label: t('home.sort.priceAsc'), icon: '💰' },
-                            { key: 'priceDesc', label: t('home.sort.priceDesc'), icon: '💰' },
-                        ].map(opt => (
-                            <Button
-                                key={opt.key}
+                </div>
+                <div
+                    ref={categoriesScrollerRef}
+                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-color:#2a3444_transparent] [scrollbar-width:thin]"
+                >
+                    {categoryCards.map((item) => {
+                        const active = selectedCategory === item.key
+                        return (
+                            <button
+                                key={item.key || "all"}
                                 type="button"
-                                variant={sortKey === opt.key ? "secondary" : "ghost"}
-                                size="sm"
+                                onClick={() => setSelectedCategory(item.key)}
                                 className={cn(
-                                    "h-8 px-3 text-xs rounded-lg whitespace-nowrap",
-                                    sortKey === opt.key ? "bg-secondary font-medium text-secondary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    "group relative flex h-40 min-w-[176px] snap-start flex-col items-center justify-center overflow-hidden rounded-[24px] border bg-[#121822]/90 p-6 text-center transition-all duration-300",
+                                    active
+                                        ? "border-[#e11d2e66] shadow-[0_0_30px_rgba(225,29,46,0.25)]"
+                                        : "border-[#273243] hover:border-[#e11d2e55] hover:bg-[#161d28]"
                                 )}
-                                onClick={() => setSortKey(opt.key)}
                             >
-                                {opt.label}
-                            </Button>
-                        ))}
-                    </div>
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(225,29,46,0.12),transparent_55%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                                <div className={cn("mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl border text-lg font-semibold", active ? "border-[#e11d2e66] bg-[#3a1319] text-[#ff4b57]" : "border-[#2f3948] bg-[#1a2230] text-[#9aa8bd]")}>{item.icon}</div>
+                                <span className={cn("relative z-10 text-base font-medium", active ? "text-white" : "text-[#c5cfdf]")}>{item.label}</span>
+                            </button>
+                        )
+                    })}
                 </div>
-            </div>
-
-            {/* Main Product Grid (Full Width) */}
-            <section>
-                {sortedProducts.length === 0 ? (
-                    <div className="text-center py-20 bg-muted/30 rounded-2xl border border-dashed border-muted-foreground/20 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.04),_transparent_60%)] dark:bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.06),_transparent_60%)]" />
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
-                            <svg className="w-8 h-8 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                        </div>
-                        <p className="text-muted-foreground font-medium">{t('home.noProducts')}</p>
-                        <p className="text-sm text-muted-foreground/60 mt-2">{t('home.checkBackLater')}</p>
-                        {selectedCategory && (
-                            <Button variant="link" className="mt-4" onClick={() => setSelectedCategory(null)}>
-                                {t('common.all')}
-                            </Button>
-                        )}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                        {pageItems.map((product, index) => (
-                            <Card
-                                key={product.id}
-                                className="group relative overflow-hidden flex flex-col rounded-2xl border border-border/30 bg-card shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.06)] transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 motion-reduce:animate-none"
-                                style={{ animationDelay: `${index * 60}ms` }}
-                            >
-                                <Link
-                                    href={`/buy/${product.id}`}
-                                    aria-label={t('common.viewDetails')}
-                                    className="absolute inset-0 z-10"
-                                />
-                                {/* Image Section */}
-                                <div className="relative m-4 aspect-[16/10] overflow-hidden rounded-xl border border-border/20 bg-muted/10">
-                                    <Image
-                                        src={product.image || `https://api.dicebear.com/7.x/shapes/svg?seed=${product.id}`}
-                                        alt={product.name}
-                                        fill
-                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        priority={index < 2}
-                                        className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
-                                    />
-                                    {product.category && product.category !== 'general' && (
-                                        <Badge className="absolute top-2 right-2 text-[10px] h-5 px-2 capitalize bg-background/90 border border-border/30 text-foreground shadow-sm">
-                                            {product.category}
-                                        </Badge>
-                                    )}
-                                </div>
-                                <div className="mx-4 h-px bg-border/15" />
-
-                                {/* Content Section */}
-                                <CardContent className="relative z-20 flex-1 px-5 pb-5 pt-4 pointer-events-none">
-                                    <div className="flex items-start justify-between gap-2 mb-1.5">
-                                        <h3 className="font-bold text-base tracking-tight group-hover:text-primary transition-colors duration-300 leading-snug line-clamp-1" title={product.name}>
-                                            {product.name}
-                                        </h3>
-                                    </div>
-
-                                    {product.isHot && (
-                                        <div className="mb-2">
-                                            <Badge variant="default" className="text-[10px] h-4 px-1.5 bg-orange-500 text-white border-0 shadow-sm">
-                                                🔥 {t('buy.hot')}
-                                            </Badge>
-                                        </div>
-                                    )}
-
-                                    {/* Rating */}
-                                    {product.reviewCount !== undefined && product.reviewCount > 0 && (
-                                        <div className="flex items-center gap-1.5 mb-2.5">
-                                            <StarRatingStatic rating={Math.round(product.rating || 0)} size="xs" />
-                                            <span className="text-[10px] text-muted-foreground font-medium">({product.reviewCount})</span>
-                                        </div>
-                                    )}
-
-                                    <div className="text-muted-foreground text-xs line-clamp-2 h-8 leading-4 overflow-hidden opacity-90">
-                                        {product.descriptionPlain || product.description || t('buy.noDescription')}
-                                    </div>
-                                </CardContent>
-
-                                {/* Footer Section */}
-                                <CardFooter className="relative z-20 px-5 py-4 flex flex-wrap items-center gap-3 mt-auto border-t border-border/15 bg-transparent pointer-events-none">
-                                    <div className="flex min-w-0 flex-1 flex-col">
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-xl font-black text-primary tabular-nums whitespace-nowrap tracking-tight">{Number(product.price)}</span>
-                                            <span className="text-xs text-muted-foreground font-medium uppercase">{t('common.credits')}</span>
-                                            {product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price) && (
-                                                <span className="text-xs text-muted-foreground/70 line-through tabular-nums">
-                                                    {Number(product.compareAtPrice)}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="flex items-center text-xs text-muted-foreground">
-                                                {/* Assuming Archive icon is imported, e.g., from 'lucide-react' */}
-                                                {/* <Archive className="w-3 h-3 mr-1" /> */}
-                                                <span>{t('admin.products.stock')}: {product.stockCount >= INFINITE_STOCK ? '∞' : product.stockCount}</span>
-                                            </div>
-                                            <span className="text-[10px] text-muted-foreground">
-                                                {t('common.sold')}: {product.soldCount}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <Link href={`/buy/${product.id}`} className="ml-auto relative z-30 pointer-events-auto">
-                                        <Button
-                                            size="sm"
-                                            className={cn(
-                                                "h-9 px-5 text-xs font-semibold rounded-full backdrop-blur-sm shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 active:scale-95 cursor-pointer",
-                                                product.stockCount > 0 ? "bg-primary/90 text-primary-foreground hover:bg-primary" : "bg-muted/80 text-muted-foreground hover:bg-muted"
-                                            )}
-                                            disabled={product.stockCount <= 0}
-                                        >
-                                            {product.stockCount > 0 ? t('common.buy') : t('common.outOfStock')}
-                                        </Button>
-                                    </Link>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                )}
             </section>
+            ) : null}
 
-            {sortedProducts.length > 0 && (
-                <div className="flex items-center justify-between mt-10 text-sm text-muted-foreground">
-                    <span>
-                        {t('search.page', { page: currentPage, totalPages })}
-                    </span>
-                    {hasMore && (
-                        <Button variant="outline" size="sm" onClick={() => setPage(currentPage + 1)}>
-                            {t('common.loadMore')}
-                        </Button>
+            <section className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)]">
+                <aside className="h-fit lg:sticky lg:top-24">
+                    <div className="rounded-[24px] border border-[#2d3747] bg-[#1c2532] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                        <div className="flex items-center justify-between gap-3">
+                            <h3 className="text-lg font-semibold text-[#dce6f4]">小店营业中 🟢</h3>
+                            <span className="rounded-full border border-[#2f4b3a] bg-[#1f2d26] px-2 py-0.5 text-[11px] text-[#8ef1b5]">在线</span>
+                        </div>
+                        <p className="mt-4 text-base font-medium leading-relaxed text-[#e7eef9]">欢迎光临！目前一切运行正常。</p>
+                        <div className="mt-4 flex items-center gap-2 text-sm text-[#95a6bb]">
+                            <span className="relative inline-flex h-2.5 w-2.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+                                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                            </span>
+                            <span>一切运行正常</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <div className="min-w-0">
+                    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                            <h1 className="font-display text-4xl font-bold tracking-tight text-white">发现商品</h1>
+                            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-[#9eacbf]">
+                                <span className="inline-flex items-center gap-2">
+                                    <span className="h-2 w-2 rounded-full bg-[#e11d2e] shadow-[0_0_12px_rgba(225,29,46,0.8)]" />
+                                    实时库存
+                                </span>
+                                {typeof visitorCount === "number" ? (
+                                    <>
+                                        <span className="text-[#485567]">|</span>
+                                        <span>{t("home.visitorCount", { count: visitorCount })}</span>
+                                    </>
+                                ) : null}
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#2a3444] bg-[#121923] p-1 text-xs">
+                            <span className="rounded-xl bg-[#1f2937] px-4 py-2 font-medium text-white">推荐序</span>
+                            <span className="rounded-xl px-4 py-2 font-medium text-[#8fa0b5]">最新序</span>
+                            <span className="rounded-xl px-4 py-2 font-medium text-[#8fa0b5]">价格序</span>
+                        </div>
+                    </div>
+
+                    <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#273243] bg-[#121822]/90 p-2.5">
+                        <div className="relative flex-1">
+                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#78879b]" />
+                            <Input
+                                placeholder={t("common.searchPlaceholder")}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="h-10 rounded-xl border-[#2f3a4a] bg-[#1a2230] pl-9 text-white placeholder:text-[#6f7d91]"
+                            />
+                        </div>
+                        <Badge className="rounded-full border border-[#2e3a4b] bg-[#1a2230] px-3 py-1 text-xs font-medium text-[#bcc9da]">
+                            <Filter className="mr-1.5 h-3.5 w-3.5" />
+                            {sortedProducts.length} 件
+                        </Badge>
+                    </div>
+
+                    {sortedProducts.length === 0 ? (
+                        <div className="relative flex min-h-[620px] flex-col items-center justify-center overflow-hidden rounded-[34px] border border-dashed border-[#2a3444] bg-[#101722]/80 p-10 text-center">
+                            <div className="absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(225,29,46,0.35),rgba(225,29,46,0))]" />
+                            <div className="relative mb-8 inline-flex h-24 w-24 items-center justify-center rounded-3xl border border-[#e11d2e66] bg-[#2f1118] text-[#ff5967]">
+                                <PackageOpen className="h-10 w-10" />
+                            </div>
+                            <h3 className="font-display text-5xl font-bold tracking-tight text-white">这里暂时没有商品</h3>
+                            <p className="mt-5 max-w-xl text-xl leading-relaxed text-[#a4b1c4]">
+                                该分类当前没有库存。你可以先浏览热门商品，或者稍后再回来看看。
+                            </p>
+                            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                                <span className="inline-flex h-11 items-center rounded-full bg-[#e11d2e] px-7 text-sm font-semibold text-white">精选陈列</span>
+                                <span className="inline-flex h-11 items-center rounded-full border border-[#2c3646] bg-[#1a2230] px-7 text-sm text-[#ccd7e6]">静态展示</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                            {pageItems.map((product, index) => (
+                                <article
+                                    key={product.id}
+                                    className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#2a3444] bg-[#121a25]/92 transition-all duration-300 hover:-translate-y-1 hover:border-[#e11d2e66] hover:shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
+                                    style={{ animationDelay: `${index * 40}ms` }}
+                                >
+                                    <Link href={`/buy/${product.id}`} className="absolute inset-0 z-20" aria-label={t("common.viewDetails")} />
+                                    <div className="relative m-4 aspect-[16/10] overflow-hidden rounded-2xl border border-[#2f3a4b] bg-[#0f1520]">
+                                        <Image
+                                            src={product.image || `https://api.dicebear.com/7.x/shapes/svg?seed=${product.id}`}
+                                            alt={product.name}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                            priority={index < 3}
+                                            className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        {product.category ? (
+                                            <Badge className="absolute right-2 top-2 rounded-full border border-[#3b4658] bg-[#161f2d] px-2.5 py-1 text-[10px] font-medium capitalize text-[#ced9ea]">
+                                                {product.category}
+                                            </Badge>
+                                        ) : null}
+                                    </div>
+
+                                    <div className="flex flex-1 flex-col px-5 pb-5">
+                                        <div className="flex items-start gap-3">
+                                            <h3 className="pointer-events-none line-clamp-1 font-display text-xl font-semibold tracking-tight text-white">
+                                                {product.name}
+                                            </h3>
+                                            {product.isHot ? (
+                                                <span className="mt-1 inline-flex items-center rounded-full border border-[#f43f5e55] bg-[#f43f5e1a] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#ff6b7f]">
+                                                    热门
+                                                </span>
+                                            ) : null}
+                                        </div>
+                                        {product.reviewCount !== undefined && product.reviewCount > 0 ? (
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <StarRatingStatic rating={Math.round(product.rating || 0)} size="xs" />
+                                                <span className="text-xs text-[#8ea0b5]">({product.reviewCount})</span>
+                                            </div>
+                                        ) : null}
+                                        <p className="pointer-events-none mt-3 line-clamp-2 min-h-10 text-sm leading-relaxed text-[#9baac0]">
+                                            {product.descriptionPlain || product.description || t("buy.noDescription")}
+                                        </p>
+
+                                        <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+                                            <div className="pointer-events-none">
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-2xl font-black tracking-tight text-[#ff4b57]">{Number(product.price)}</span>
+                                                    <span className="text-xs uppercase text-[#8fa1b8]">{t("common.credits")}</span>
+                                                </div>
+                                                <div className="mt-1 flex items-center gap-2 text-xs text-[#8797ae]">
+                                                    <span>{t("common.stock")}: {product.stockCount >= INFINITE_STOCK ? "无限" : product.stockCount}</span>
+                                                    <span className="text-[#445064]">|</span>
+                                                    <span>{t("common.sold")}: {product.soldCount}</span>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                disabled={product.stockCount <= 0}
+                                                className={cn(
+                                                    "pointer-events-none relative z-10 h-10 rounded-full px-5 text-xs font-semibold",
+                                                    product.stockCount > 0
+                                                        ? "bg-[#e11d2e] text-white hover:bg-[#c71627]"
+                                                        : "bg-[#222c3a] text-[#8393aa]"
+                                                )}
+                                            >
+                                                {product.stockCount > 0 ? t("common.buy") : t("common.outOfStock")}
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price) ? (
+                                        <div className="pointer-events-none absolute right-4 top-4 inline-flex items-center rounded-full bg-[#e11d2e] px-2 py-1 text-[10px] font-semibold text-white">
+                                            <Sparkles className="mr-1 h-3 w-3" />
+                                            优惠
+                                        </div>
+                                    ) : null}
+                                </article>
+                            ))}
+                        </div>
                     )}
+
+                    {sortedProducts.length > 0 ? (
+                        <div className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-[#273243] bg-[#121822]/75 px-4 py-3 text-sm text-[#9eacc0]">
+                            <span>{t("search.page", { page: currentPage, totalPages })}</span>
+                            {hasMore ? (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setPage(currentPage + 1)}
+                                    className="h-9 rounded-full border-[#2d3748] bg-[#1a2230] px-4 text-xs text-[#d9e4f4] hover:bg-[#232d3f]"
+                                >
+                                    {t("common.loadMore")}
+                                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                                </Button>
+                            ) : (
+                                <span className="text-xs text-[#6f8096]">已经到底了</span>
+                            )}
+                        </div>
+                    ) : null}
                 </div>
-            )}
+            </section>
         </main>
     )
 }
+
+
+
+
+

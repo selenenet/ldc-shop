@@ -1,4 +1,3 @@
-import { cookies, headers } from "next/headers"
 import en from '@/locales/en.json'
 import zh from '@/locales/zh.json'
 
@@ -19,14 +18,7 @@ function interpolate(text: string, params?: Record<string, string | number>): st
 }
 
 async function detectLocale(): Promise<Locale> {
-  const cookieStore = await cookies()
-  const cookieLocale = cookieStore.get('ldc-locale')?.value as Locale | undefined
-  if (cookieLocale && translations[cookieLocale]) return cookieLocale
-
-  const headerList = await headers()
-  const acceptLang = headerList.get('accept-language') || ''
-  if (acceptLang.toLowerCase().includes('zh')) return 'zh'
-  return 'en'
+  return 'zh'
 }
 
 export async function getServerI18n() {

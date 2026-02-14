@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 // OKLCH hue values for each theme color
 const THEME_HUES: Record<string, number> = {
-    purple: 270,  // Default
+    purple: 270,
     indigo: 255,
     blue: 240,
     cyan: 200,
@@ -35,10 +35,10 @@ interface ThemeColorProviderProps {
 
 export function ThemeColorProvider({ color, children }: ThemeColorProviderProps) {
     useEffect(() => {
-        const hue = THEME_HUES[color || 'purple'] || 270
-        const chroma = THEME_CHROMA[color || 'purple'] ?? 1
-        const primaryL = THEME_PRIMARY_L[color || 'purple'] ?? 0.45
-        const primaryDarkL = THEME_PRIMARY_DARK_L[color || 'purple'] ?? 0.7
+        const hue = THEME_HUES[color || 'red'] || 25
+        const chroma = THEME_CHROMA[color || 'red'] ?? 1
+        const primaryL = THEME_PRIMARY_L[color || 'red'] ?? 0.52
+        const primaryDarkL = THEME_PRIMARY_DARK_L[color || 'red'] ?? 0.72
         const root = document.documentElement
 
         root.style.setProperty('--theme-hue', String(hue))

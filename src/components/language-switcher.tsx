@@ -1,34 +1,26 @@
 'use client'
 
 import { useI18n } from '@/lib/i18n/context'
-import { Button } from '@/components/ui/button'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Languages } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export function LanguageSwitcher() {
-    const { locale, setLocale, t } = useI18n()
+interface LanguageSwitcherProps {
+    className?: string
+    showLabel?: boolean
+}
+
+export function LanguageSwitcher({ className, showLabel = true }: LanguageSwitcherProps) {
+    const { t } = useI18n()
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1">
-                    <Languages className="h-4 w-4" />
-                    <span className="hidden sm:inline">{locale === 'zh' ? '中文' : 'EN'}</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLocale('en')} className={locale === 'en' ? 'bg-accent' : ''}>
-                    English
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLocale('zh')} className={locale === 'zh' ? 'bg-accent' : ''}>
-                    中文
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <span
+            className={cn("inline-flex h-9 items-center gap-1 rounded-full px-3 text-[#9eb0c8]", className)}
+            title={t('language.switch')}
+            aria-label={t('language.switch')}
+            aria-hidden="true"
+        >
+            <Languages className="h-4 w-4" />
+            {showLabel ? <span className="hidden sm:inline">多语言</span> : null}
+        </span>
     )
 }

@@ -161,7 +161,7 @@ export function AdminOrderDetailContent({ order }: { order: any }) {
                   {order.username}
                 </a>
               ) : (
-                <div className="font-medium text-sm text-muted-foreground">Guest</div>
+                <div className="font-medium text-sm text-muted-foreground">访客</div>
               )}
               {order.userId && <div className="text-xs text-muted-foreground font-mono">{order.userId}</div>}
             </div>
@@ -211,3 +211,4 @@ export function AdminOrderDetailContent({ order }: { order: any }) {
     </div>
   )
 }
+

@@ -5,6 +5,7 @@ import { HomeContent } from "@/components/home-content";
 
 // Revalidate every 5 seconds for near-real-time updates
 export const revalidate = 5;
+const PAGE_SIZE = 24;
 
 export default async function Home() {
   // Run all independent queries in parallel
@@ -47,11 +48,21 @@ export default async function Home() {
     }
   }
 
-  return <HomeContent
-    products={productsWithRatings}
-    announcement={announcement}
-    visitorCount={visitorCount}
-    categories={categories}
-    pendingOrders={pendingOrders}
-  />;
+  const sortedCategoryConfig = [...categories].sort(
+    (a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0)
+  );
+  const categoryNames = sortedCategoryConfig.map((c: any) => c.name);
+
+  return (
+    <HomeContent
+      products={productsWithRatings}
+      announcement={announcement}
+      visitorCount={visitorCount}
+      categories={categoryNames}
+      categoryConfig={sortedCategoryConfig}
+      pendingOrders={pendingOrders}
+      filters={{}}
+      pagination={{ page: 1, pageSize: PAGE_SIZE, total: productsWithRatings.length }}
+    />
+  );
 }

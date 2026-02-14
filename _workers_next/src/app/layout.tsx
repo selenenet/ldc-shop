@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import { getSetting } from "@/lib/db/queries";
 import { Suspense } from "react";
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
+const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display" });
 
 const DEFAULT_TITLE = "LDC Virtual Goods Shop";
 const DEFAULT_DESCRIPTION = "High-quality virtual goods, instant delivery";
@@ -96,10 +97,10 @@ async function RootLayoutContent({
   } catch {
     themeColor = null;
   }
-  const themeHue = THEME_HUES[themeColor || "purple"] || 270;
-  const themeChroma = THEME_CHROMA[themeColor || "purple"] ?? 1;
-  const themePrimaryL = THEME_PRIMARY_L[themeColor || "purple"] ?? 0.45;
-  const themePrimaryDarkL = THEME_PRIMARY_DARK_L[themeColor || "purple"] ?? 0.7;
+  const themeHue = THEME_HUES[themeColor || "red"] || 25;
+  const themeChroma = THEME_CHROMA[themeColor || "red"] ?? 1;
+  const themePrimaryL = THEME_PRIMARY_L[themeColor || "red"] ?? 0.52;
+  const themePrimaryDarkL = THEME_PRIMARY_DARK_L[themeColor || "red"] ?? 0.72;
 
   return (
     <html
@@ -120,7 +121,7 @@ async function RootLayoutContent({
           }}
         />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", manrope.variable, display.variable, manrope.className)}>
         <Providers themeColor={themeColor}>
           <div className="relative flex min-h-screen flex-col">
             <SiteHeader />
@@ -137,7 +138,7 @@ async function RootLayoutContent({
 function RootLayoutFallback() {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", manrope.variable, display.variable, manrope.className)}>
         <div className="relative flex min-h-screen flex-col">
           <div className="h-16 border-b border-border/40 bg-background/70" />
           <div className="flex-1" />

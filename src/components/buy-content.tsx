@@ -304,38 +304,38 @@ export function BuyContent({
                                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                         {shareLinks?.x ? (
                                             <Button asChild variant="outline">
-                                                <a href={shareLinks.x} target="_blank" rel="noopener noreferrer">X (Twitter)</a>
+                                                <a href={shareLinks.x} target="_blank" rel="noopener noreferrer">X（推特）</a>
                                             </Button>
                                         ) : (
-                                            <Button variant="outline" disabled>X (Twitter)</Button>
+                                            <Button variant="outline" disabled>X（推特）</Button>
                                         )}
                                         {shareLinks?.facebook ? (
                                             <Button asChild variant="outline">
-                                                <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
+                                                <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer">脸书</a>
                                             </Button>
                                         ) : (
-                                            <Button variant="outline" disabled>Facebook</Button>
+                                            <Button variant="outline" disabled>脸书</Button>
                                         )}
                                         {shareLinks?.telegram ? (
                                             <Button asChild variant="outline">
-                                                <a href={shareLinks.telegram} target="_blank" rel="noopener noreferrer">Telegram</a>
+                                                <a href={shareLinks.telegram} target="_blank" rel="noopener noreferrer">电报</a>
                                             </Button>
                                         ) : (
-                                            <Button variant="outline" disabled>Telegram</Button>
+                                            <Button variant="outline" disabled>电报</Button>
                                         )}
                                         {shareLinks?.whatsapp ? (
                                             <Button asChild variant="outline">
-                                                <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                                                <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp（海外）</a>
                                             </Button>
                                         ) : (
-                                            <Button variant="outline" disabled>WhatsApp</Button>
+                                            <Button variant="outline" disabled>WhatsApp（海外）</Button>
                                         )}
                                         {shareLinks?.line ? (
                                             <Button asChild variant="outline">
-                                                <a href={shareLinks.line} target="_blank" rel="noopener noreferrer">Line</a>
+                                                <a href={shareLinks.line} target="_blank" rel="noopener noreferrer">LINE</a>
                                             </Button>
                                         ) : (
-                                            <Button variant="outline" disabled>Line</Button>
+                                            <Button variant="outline" disabled>LINE</Button>
                                         )}
                                     </div>
                                     <Button
@@ -390,3 +390,4 @@ export function BuyContent({
         </main>
     )
 }
+

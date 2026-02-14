@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { LanguageSwitcher } from "@/components/language-switcher"
-import { ShoppingBag } from "lucide-react"
+import { ShoppingBag, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -20,15 +20,18 @@ export function HeaderLogo({ adminName, shopNameOverride, shopLogoOverride }: { 
         : t('common.appName')
 
     return (
-        <Link href="/" className="flex items-center gap-2 min-w-0 group text-muted-foreground hover:text-primary transition-colors duration-200 hover:-translate-y-0.5">
+        <Link
+            href="/"
+            className="group inline-flex items-center gap-3 rounded-full border border-[#2a3443] bg-[#111821]/90 px-2.5 py-2 text-white shadow-[0_10px_28px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors duration-200 hover:border-[#e11d2e66]"
+        >
             {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-8 w-8 rounded-lg object-contain" />
+                <img src={logoUrl} alt="店铺标志" className="h-9 w-9 rounded-full object-cover" />
             ) : (
-                <div className="h-8 w-8 rounded-lg bg-foreground flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
-                    <ShoppingBag className="h-4 w-4 text-background" />
-                </div>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#e11d2e] text-white shadow-[0_0_18px_rgba(225,29,46,0.45)]">
+                    <ShoppingBag className="h-4 w-4" />
+                </span>
             )}
-            <span className="text-xs sm:text-sm font-semibold tracking-tight truncate max-w-[160px] sm:max-w-[220px] md:max-w-none">
+            <span className="font-display max-w-[180px] truncate text-base font-semibold tracking-tight text-white sm:max-w-[220px]">
                 {override || shopName}
             </span>
         </Link>
@@ -37,32 +40,27 @@ export function HeaderLogo({ adminName, shopNameOverride, shopLogoOverride }: { 
 
 export function HeaderNav({ isAdmin, isLoggedIn, showNav = true }: { isAdmin: boolean; isLoggedIn: boolean; showNav?: boolean }) {
     const { t } = useI18n()
-    const isZh = t('common.myOrders').includes('订单')
 
     return (
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden items-center gap-4 xl:flex">
             {showNav && (
                 <Link
                     href="/nav"
-                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 hover:-translate-y-0.5"
+                    className="text-sm font-medium text-[#95a4b8] transition-colors hover:text-white"
                 >
                     {t('common.navigator')}
                 </Link>
             )}
             {isLoggedIn && (
-                <>
-                    <Link
-                        href="/profile"
-                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 hover:-translate-y-0.5"
-                    >
-                        {isZh ? "个人中心" : "Profile"}
-                    </Link>
-                </>
+                <Link
+                    href="/profile"
+                    className="text-sm font-medium text-[#95a4b8] transition-colors hover:text-white"
+                >个人中心</Link>
             )}
             {isAdmin && (
                 <Link
                     href="/admin/settings"
-                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 hover:-translate-y-0.5"
+                    className="text-sm font-medium text-[#95a4b8] transition-colors hover:text-white"
                 >
                     {t('common.admin')}
                 </Link>
@@ -71,7 +69,7 @@ export function HeaderNav({ isAdmin, isLoggedIn, showNav = true }: { isAdmin: bo
     )
 }
 
-export function HeaderSearch({ className }: { className?: string }) {
+export function HeaderSearch({ className, inputClassName }: { className?: string; inputClassName?: string }) {
     const { t } = useI18n()
     const router = useRouter()
     const [q, setQ] = useState("")
@@ -86,11 +84,18 @@ export function HeaderSearch({ className }: { className?: string }) {
                 router.push(`/search?q=${encodeURIComponent(query)}`)
             }}
         >
-            <Input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder={t('search.placeholder')}
-            />
+            <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7f8ea3]" />
+                <Input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder={t('search.placeholder')}
+                    className={cn(
+                        "h-10 rounded-full border-[#2f3948] bg-transparent pl-9 text-sm text-white placeholder:text-[#67768b]",
+                        inputClassName
+                    )}
+                />
+            </div>
         </form>
     )
 }
@@ -107,7 +112,7 @@ export function HeaderUserMenuItems({ isAdmin, showNav = true }: { isAdmin: bool
             )}
             <DropdownMenuItem asChild>
                 <Link href="/profile" className="flex w-full items-center justify-between gap-2">
-                    <span>{t('common.myOrders').includes('订单') ? "个人中心" : "Profile"}</span>
+                    <span>个人中心</span>
                     <HeaderUnreadBadge className="ml-2" />
                 </Link>
             </DropdownMenuItem>
@@ -169,8 +174,11 @@ export function HeaderUnreadBadge({ initialCount = 0, desktopEnabled = false, cl
     if (!count) return null
 
     return (
-        <span className={cn("inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white", className)}>
+        <span className={cn("inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e11d2e] px-1 text-[10px] font-medium text-white", className)}>
             {count > 99 ? "99+" : count}
         </span>
     )
 }
+
+
+

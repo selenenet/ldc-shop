@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
 import en from '@/locales/en.json'
 import zh from '@/locales/zh.json'
 
@@ -29,34 +29,8 @@ function interpolate(text: string, params?: Record<string, string | number>): st
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-    const [locale, setLocaleState] = useState<Locale>('en')
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => {
-        setMounted(true)
-        // Check localStorage first
-        const saved = localStorage.getItem('ldc-locale') as Locale | null
-        if (saved && translations[saved]) {
-            setLocaleState(saved)
-            document.cookie = `ldc-locale=${saved}; path=/; max-age=31536000`
-            return
-        }
-        // Detect from browser
-        const browserLang = navigator.language.toLowerCase()
-        if (browserLang.startsWith('zh')) {
-            setLocaleState('zh')
-            document.cookie = `ldc-locale=zh; path=/; max-age=31536000`
-        } else {
-            setLocaleState('en')
-            document.cookie = `ldc-locale=en; path=/; max-age=31536000`
-        }
-    }, [])
-
-    const setLocale = (newLocale: Locale) => {
-        setLocaleState(newLocale)
-        localStorage.setItem('ldc-locale', newLocale)
-        document.cookie = `ldc-locale=${newLocale}; path=/; max-age=31536000`
-    }
+    const locale: Locale = 'zh'
+    const setLocale = (_newLocale: Locale) => { }
 
     const t = (key: string, params?: Record<string, string | number>): string => {
         const text = getNestedValue(translations[locale], key)
@@ -75,10 +49,10 @@ export function useI18n() {
     if (!context) {
         // Return default values for server-side rendering
         return {
-            locale: 'en' as Locale,
+            locale: 'zh' as Locale,
             setLocale: () => { },
             t: (key: string, params?: Record<string, string | number>) => {
-                const text = getNestedValue(en, key)
+                const text = getNestedValue(zh, key)
                 return interpolate(text, params)
             }
         }

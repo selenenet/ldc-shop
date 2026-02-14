@@ -93,7 +93,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
         <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">{t('admin.settings.notifications.title')}</h2>
 
-            {/* 功能介绍卡片 */}
+            {/* 鍔熻兘浠嬬粛鍗＄墖 */}
             <Card className="border-primary/20 bg-primary/5">
                 <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -122,7 +122,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
                 </CardContent>
             </Card>
 
-            {/* 配置表单 */}
+            {/* 閰嶇疆琛ㄥ崟 */}
             <Card>
                 <CardHeader>
                     <CardTitle>Telegram Bot {t('admin.settings.notifications.configTitle')}</CardTitle>
@@ -168,7 +168,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
                                     size="sm"
                                     onClick={() => setLanguage('en')}
                                 >
-                                    English
+                                    英文
                                 </Button>
                             </div>
                             <input type="hidden" name="telegramLanguage" value={language} />
@@ -191,7 +191,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
                 </CardContent>
             </Card>
 
-            {/* 邮件通知配置 */}
+            {/* 閭欢閫氱煡閰嶇疆 */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
                                     size="sm"
                                     onClick={() => setEmailLanguage('en')}
                                 >
-                                    English
+                                    英文
                                 </Button>
                             </div>
                             <input type="hidden" name="emailLanguage" value={emailLanguage} />
@@ -306,7 +306,7 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
                 </CardContent>
             </Card>
 
-            {/* 配置指南 */}
+            {/* 閰嶇疆鎸囧崡 */}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg">{t('admin.settings.notifications.guide')}</CardTitle>
@@ -393,3 +393,4 @@ export function NotificationsContent({ settings }: NotificationsContentProps) {
         </div>
     )
 }
+
