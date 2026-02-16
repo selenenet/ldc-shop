@@ -7,13 +7,13 @@ import { eq, sql, inArray, and, or, isNull, lte } from "drizzle-orm"
 import { sendTelegramMessage } from "@/lib/notifications"
 import { revalidatePath, updateTag } from "next/cache"
 import { setSetting, getSetting, recalcProductAggregates, recalcProductAggregatesForMany, getProductForAdmin } from "@/lib/db/queries"
-import { isAdminUsername } from "@/lib/admin-auth"
+import { isAdminUser } from "@/lib/admin-auth"
 import { unstable_noStore } from "next/cache"
 
 export async function checkAdmin() {
     const session = await auth()
     const user = session?.user
-    if (!user || !isAdminUsername(user.username)) {
+    if (!user || !isAdminUser(user)) {
         throw new Error("Unauthorized")
     }
 }

@@ -4,10 +4,10 @@ import { db } from "@/lib/db"
 import { orders, reviews, settings, products, cards, loginUsers, categories, refundRequests, dailyCheckins } from "@/lib/db/schema"
 import { and, desc, eq, or, sql } from "drizzle-orm"
 import { getProducts, normalizeTimestampMs } from "@/lib/db/queries"
+import { isAdminUser } from "@/lib/admin-auth"
 
-function requireAdminUsername(username?: string | null) {
-  const adminUsers = process.env.ADMIN_USERS?.toLowerCase().split(",") || []
-  if (!username || !adminUsers.includes(username.toLowerCase())) {
+function requireAdminUser(user?: { username?: string | null; name?: string | null } | null) {
+  if (!isAdminUser(user)) {
     throw new Error("Unauthorized")
   }
 }
@@ -64,7 +64,7 @@ function rowToInsertOrIgnore(table: string, row: Record<string, any>): string {
 
 export async function GET(req: Request) {
   const session = await auth()
-  requireAdminUsername(session?.user?.username ?? null)
+  requireAdminUser(session?.user ?? null)
 
   const { searchParams } = new URL(req.url)
   const type = (searchParams.get("type") || "").toLowerCase()

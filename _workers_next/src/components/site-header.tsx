@@ -17,6 +17,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { getSetting, recordLoginUser, setSetting, getUserUnreadNotificationCount, getLoginUserDesktopNotificationsEnabled } from "@/lib/db/queries"
 import { isRegistryEnabled } from "@/lib/registry"
 import { CheckInButton } from "@/components/checkin-button"
+import { isAdminUser } from "@/lib/admin-auth"
 
 export async function SiteHeader() {
     const session = await auth()
@@ -25,10 +26,12 @@ export async function SiteHeader() {
         await recordLoginUser(user.id, user.username || user.name || null, user.email || null)
     }
 
-    const rawAdminUsers = process.env.ADMIN_USERS?.split(',') || []
-    const adminUsers = rawAdminUsers.map((u) => u.toLowerCase())
-    const isAdmin = (user?.username && adminUsers.includes(user.username.toLowerCase())) || false
-    const firstAdminName = rawAdminUsers[0]?.trim()
+    const rawAdminUsers = (process.env.ADMIN_USERS || "")
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean)
+    const isAdmin = isAdminUser(user)
+    const firstAdminName = rawAdminUsers[0] || undefined
 
     let shopNameOverride: string | null = null
     let shopLogoOverride: string | null = null

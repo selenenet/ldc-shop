@@ -6,16 +6,17 @@ import { getSetting, setSetting } from "@/lib/db/queries"
 import { RegistryPrompt } from "@/components/admin/registry-prompt"
 import { isRegistryEnabled } from "@/lib/registry"
 import { Suspense } from "react"
+import { getAdminIdentity, isAdminUser } from "@/lib/admin-auth"
 
 async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const session = await auth()
     const user = session?.user
 
-    // Admin Check - redirect to home if not admin
-    const adminUsers = process.env.ADMIN_USERS?.toLowerCase().split(',') || []
-    if (!user || !user.username || !adminUsers.includes(user.username.toLowerCase())) {
+    // Admin check with fallback to user.name when username is unavailable.
+    if (!user || !isAdminUser(user)) {
         redirect("/")
     }
+    const sidebarUsername = getAdminIdentity(user) || "admin"
 
     if (user?.avatar_url) {
         try {
@@ -53,7 +54,7 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             <UpdateNotification />
             <RegistryPrompt shouldPrompt={shouldPrompt} registryEnabled={registryEnabled} />
             <div className="flex flex-1 flex-col md:flex-row">
-                <AdminSidebar username={user.username} />
+                <AdminSidebar username={sidebarUsername} />
                 <main className="flex-1 p-6 md:p-12 overflow-y-auto">
                     {children}
                 </main>

@@ -1,16 +1,14 @@
 import { auth } from "@/lib/auth"
 import { getSetting } from "@/lib/db/queries"
 import { isRegistryEnabled } from "@/lib/registry"
+import { isAdminUser } from "@/lib/admin-auth"
 import { MobileNav } from "./mobile-nav"
 
 export async function MobileNavWrapper() {
     const session = await auth()
     const user = session?.user
 
-    // Check if admin (case-insensitive)
-    const rawAdminUsers = process.env.ADMIN_USERS?.split(',') || []
-    const adminUsers = rawAdminUsers.map(u => u.toLowerCase())
-    const isAdmin = user?.username && adminUsers.includes(user.username.toLowerCase()) || false
+    const isAdmin = isAdminUser(user)
 
     const registryEnabled = isRegistryEnabled()
     let registryOptIn = false
